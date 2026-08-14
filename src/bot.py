@@ -10,6 +10,8 @@ from telegram.ext import (
 )
 
 TOKEN = os.environ["BOT_TOKEN"]
+
+# Chat ID / User ID ادمین
 ADMIN_CHAT_ID = 7122415157
 
 
@@ -22,21 +24,26 @@ async def handle_message(
 
     user = update.effective_user
     message = update.message
+    text = message.text or "[پیام غیرمتنی]"
 
-    # اطلاعات کاربر
-    full_name = user.full_name or "نام نامشخص"
-    username = f"@{user.username}" if user.username else "ندارد"
-    user_id = user.id
+    # اگر خود ادمین پیام داده باشد:
+    # فقط مثل یک Echo Bot عادی جواب بده
+    if user and user.id == ADMIN_CHAT_ID:
+        if message.text:
+            await message.reply_text(message.text)
+        return
 
-    # زمان
+    # اطلاعات فرستنده
+    full_name = user.full_name if user else "نام نامشخص"
+    username = f"@{user.username}" if user and user.username else "ندارد"
+    user_id = user.id if user else "نامشخص"
+
+    # زمان UTC
     time = datetime.now(timezone.utc).strftime(
         "%Y-%m-%d %H:%M:%S UTC"
     )
 
-    # متن پیام
-    text = message.text or "[پیام غیرمتنی]"
-
-    # پیام اطلاع‌رسانی برای ادمین
+    # گزارش برای ادمین
     admin_message = (
         "📩 پیام جدید!\n\n"
         f"👤 نام: {full_name}\n"
@@ -47,18 +54,21 @@ async def handle_message(
         f"{text}"
     )
 
-    # ارسال اطلاع به ادمین
     await context.bot.send_message(
         chat_id=ADMIN_CHAT_ID,
         text=admin_message
     )
+
+    # Echo عادی برای کاربر
+    if message.text:
+        await message.reply_text(message.text)
 
 
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(
     MessageHandler(
-        filters.ALL & ~filters.COMMAND,
+        filters.TEXT & ~filters.COMMAND,
         handle_message
     )
 )
