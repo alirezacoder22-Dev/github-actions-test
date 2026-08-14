@@ -9,7 +9,9 @@ from telegram.ext import (
 )
 
 
-TOKEN = "8734182879:AAGd-9sO90VKTA9HCRZvzqjgzTHaLmPFUXo"
+TOKEN = os.environ["BOT_TOKEN"]
+
+
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
