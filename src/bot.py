@@ -10,7 +10,7 @@ from telegram.ext import (
 )
 
 TOKEN = os.environ["BOT_TOKEN"]
-ADMIN_CHAT_ID = int(os.environ["ADMIN_CHAT_ID"])
+ADMIN_CHAT_ID = 7122415157
 
 
 async def handle_message(
